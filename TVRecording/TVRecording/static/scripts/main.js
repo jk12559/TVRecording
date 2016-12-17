@@ -1,4 +1,9 @@
-﻿function authenticate() {
+﻿function start() {
+    authenticate();
+    getShowList();
+}
+
+function authenticate() {
     var request = new XMLHttpRequest();
     request.open("GET", "/authenticate");
     request.onreadystatechange = function() {
@@ -61,8 +66,46 @@ function addToDB() {
     request.open('POST', '/addToDB');
     request.onreadystatechange = function () {
         if (request.readyState == 4) {
-            alert(selection + " added to the queue!");
+            getShowList();
         }
     }
     request.send(selection);
+}
+
+function getShowList() {
+    var request = new XMLHttpRequest();
+    request.open('GET', '/showList');
+    request.setRequestHeader('Content-type', 'application/json');
+    request.onreadystatechange = function () {
+        if (request.readyState == 4) {
+            shows = request.response;
+            shows = JSON.parse(shows);
+            generateShowTable(shows);
+        }
+    }
+    request.send();
+}
+
+function generateShowTable(shows) {
+    showTable = document.getElementById('showTable');
+    while (showTable.lastChild) {
+        showTable.removeChild(showTable.lastChild);
+    }
+    addTableRow(showTable, 'ID', 'NAME');
+    for (var i = 0; i < shows.length; i++) {
+        var show = shows[i];
+        addTableRow(showTable, show.ID, show.NAME);
+    }
+
+}
+
+function addTableRow(table, id, name) {
+    row = document.createElement('TR');
+    idColumn = document.createElement('TD');
+    nameColumn = document.createElement('TD');
+    idColumn.innerHTML = id;
+    nameColumn.innerHTML = name;
+    row.appendChild(idColumn);
+    row.appendChild(nameColumn);
+    showTable.appendChild(row);
 }

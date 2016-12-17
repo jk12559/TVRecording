@@ -8,6 +8,8 @@ import requests
 from TVRecording import app
 import sqlite3
 import os
+import pandas as pd
+import json
 
 loginInfo = {"apikey": "7E99A86F07764359", "username": "jk12559", "userkey": "6785F3BB1D3910F1"}
 
@@ -43,7 +45,15 @@ def addToDB():
     c.execute('INSERT OR IGNORE INTO SHOWS (ID, NAME) VALUES ({ID}, {NAME})'.format(ID = showID, NAME = sQ(showName)))
     db.commit()
     db.close()
-    return
+    return 'added'
+
+@app.route('/showList')
+def showList():
+    db = sqlite3.connect(os.path.join(app.root_path, 'tvrecording.db'))
+    shows = pd.read_sql('SELECT * FROM SHOWS', db)
+    db.close()
+    return json.dumps([x for x in shows.T.to_dict().itervalues()])
+
 
 def sQ(text):
     return "'" + text + "'"

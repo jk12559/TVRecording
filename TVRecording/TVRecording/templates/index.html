@@ -6,7 +6,7 @@
     <link type="text/css" rel="stylesheet" href="static/content/style.css" />
     <script type="text/javascript" src="static/scripts/main.js"></script>
 </head>
-<body onload="authenticate()">
+<body onload="start()">
     <div id="addAShow">
         <button onclick="getAddShowForm()">Add Show</button>
         <div id="searchShowForm">
@@ -33,6 +33,11 @@
                 </tbody>
             </table>
         </div>
+    </div>
+    <div id="displayShowList">
+        <table id="showTable">
+
+        </table>
     </div>
 </body>
 </html>
