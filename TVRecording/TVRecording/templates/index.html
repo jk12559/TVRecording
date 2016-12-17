@@ -14,6 +14,10 @@
             <input type="text" id="searchText" /><br />
             <button onclick="search()">Search</button>
         </div>
+        <div>
+            <select id="showSelection"></select>
+            <button onclick="addToDB()">Add Show to List</button>
+        </div>
         <div id="searchResults">
             <table id="searchResultsTable">
                 <thead>
@@ -28,12 +32,6 @@
 
                 </tbody>
             </table>
-        </div>
-        <div>
-            <select id="showSelection">
-
-            </select>
-            <button onclick="addToDB()">Add Show to List</button>
         </div>
     </div>
 </body>

@@ -6,6 +6,8 @@ from datetime import datetime
 from flask import render_template, request
 import requests
 from TVRecording import app
+import sqlite3
+import os
 
 loginInfo = {"apikey": "7E99A86F07764359", "username": "jk12559", "userkey": "6785F3BB1D3910F1"}
 
@@ -29,3 +31,19 @@ def showSearch():
     headers = {'Authorization': 'Bearer ' + token}
     showResponse = requests.get('https://api.thetvdb.com/search/series', params = {'name': search}, headers = headers)
     return showResponse.text
+
+@app.route('/addToDB', methods = ["POST"])
+def addToDB():
+    db = sqlite3.connect(os.path.join(app.root_path, 'tvrecording.db'))
+    c = db.cursor()
+    show = request.data
+    showSpace = show.find(' ')
+    showID = show[:showSpace]
+    showName = show[showSpace+3:]
+    c.execute('INSERT OR IGNORE INTO SHOWS (ID, NAME) VALUES ({ID}, {NAME})'.format(ID = showID, NAME = sQ(showName)))
+    db.commit()
+    db.close()
+    return
+
+def sQ(text):
+    return "'" + text + "'"

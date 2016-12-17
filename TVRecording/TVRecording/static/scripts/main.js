@@ -54,5 +54,15 @@ function displayResultsTable(data) {
 }
 
 function addToDB() {
-    //implement
+    var selection = document.getElementById('showSelection').value;
+    //var space = selection.indexOf(' ');
+    //var selectedID = selection.slice(0, space);
+    var request = new XMLHttpRequest();
+    request.open('POST', '/addToDB');
+    request.onreadystatechange = function () {
+        if (request.readyState == 4) {
+            alert(selection + " added to the queue!");
+        }
+    }
+    request.send(selection);
 }
