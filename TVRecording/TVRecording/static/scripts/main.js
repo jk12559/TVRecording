@@ -1,6 +1,7 @@
 ﻿function start() {
     authenticate();
     getShowList();
+    getEpisodeList();
 }
 
 function authenticate() {
@@ -60,13 +61,12 @@ function displayResultsTable(data) {
 
 function addToDB() {
     var selection = document.getElementById('showSelection').value;
-    //var space = selection.indexOf(' ');
-    //var selectedID = selection.slice(0, space);
     var request = new XMLHttpRequest();
     request.open('POST', '/addToDB');
     request.onreadystatechange = function () {
         if (request.readyState == 4) {
             getShowList();
+            getEpisodeList();
         }
     }
     request.send(selection);
@@ -91,15 +91,14 @@ function generateShowTable(shows) {
     while (showTable.lastChild) {
         showTable.removeChild(showTable.lastChild);
     }
-    addTableRow(showTable, 'ID', 'NAME');
+    addShowTableRow(showTable, 'ID', 'NAME');
     for (var i = 0; i < shows.length; i++) {
         var show = shows[i];
-        addTableRow(showTable, show.ID, show.NAME);
+        addShowTableRow(showTable, show.id, show.name);
     }
-
 }
 
-function addTableRow(table, id, name) {
+function addShowTableRow(table, id, name) {
     row = document.createElement('TR');
     idColumn = document.createElement('TD');
     nameColumn = document.createElement('TD');
@@ -108,4 +107,54 @@ function addTableRow(table, id, name) {
     row.appendChild(idColumn);
     row.appendChild(nameColumn);
     showTable.appendChild(row);
+}
+
+function getEpisodeList() {
+    var request = new XMLHttpRequest();
+    request.open('GET', '/episodeList');
+    request.setRequestHeader('Content-type', 'application/json');
+    request.onreadystatechange = function () {
+        if (request.readyState == 4) {
+            episodes = request.response;
+            episodes = JSON.parse(episodes);
+            generateEpisodeTable(episodes);
+        }
+    }
+    request.send();
+}
+
+function generateEpisodeTable(episodes) {
+    episodeTable = document.getElementById('episodeTable');
+    while (episodeTable.lastChild) {
+        episodeTable.removeChild(episodeTable.lastChild);
+    }
+    addEpisodeTableRow(episodeTable, 'DATE AIRED', 'SHOW NAME', 'SEASON', 'EPISODE #', 'EPISODE NAME', 'RECORDED'); 
+    for (var i = 0; i < Object.keys(episodes).length; i++) {
+        var episode = episodes[i];
+        addEpisodeTableRow(episodeTable, episode.date_aired, episode.show_name, episode.season, episode.episode_num, episode.episode_name, episode.recorded);
+    }
+}
+
+function addEpisodeTableRow(table, date_aired, show_name, season, episodeNum, episode_name, recorded) {
+    row = document.createElement('TR');
+    dateAiredColumn = document.createElement('TD');
+    showNameColumn = document.createElement('TD');
+    seasonColumn = document.createElement('TD');
+    episodeNumColumn = document.createElement('TD');
+    episodeNameColumn = document.createElement('TD');
+    recordedColumn = document.createElement('TD');
+    dateAiredColumn.innerHTML = date_aired;
+    showNameColumn.innerHTML = show_name;
+    seasonColumn.innerHTML = season;
+    episodeNumColumn.innerHTML = episodeNum;
+    episodeNameColumn.innerHTML = episode_name;
+    recordedColumn.innerHTML = recorded;
+
+    row.appendChild(dateAiredColumn);
+    row.appendChild(showNameColumn);
+    row.appendChild(seasonColumn);
+    row.appendChild(episodeNumColumn);
+    row.appendChild(episodeNameColumn);
+    row.appendChild(recordedColumn);
+    table.appendChild(row);
 }

@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="requirements.txt" />
+    <Content Include="TVRecording\dbPrep.sql" />
     <Content Include="TVRecording\static\content\style.css" />
     <Content Include="TVRecording\static\scripts\main.js" />
     <Content Include="TVRecording\templates\index.html" />
