@@ -143,11 +143,15 @@ function addEpisodeTableRow(table, date_aired, show_name, season, episodeNum, ep
     episodeNumColumn = document.createElement('TD');
     episodeNameColumn = document.createElement('TD');
     recordedColumn = document.createElement('TD');
+
     dateAiredColumn.innerHTML = date_aired;
     showNameColumn.innerHTML = show_name;
     seasonColumn.innerHTML = season;
     episodeNumColumn.innerHTML = episodeNum;
     episodeNameColumn.innerHTML = episode_name;
+    if (recorded != 'RECORDED') {
+        recorded = '<input type="checkbox"></input>';
+    }
     recordedColumn.innerHTML = recorded;
 
     row.appendChild(dateAiredColumn);
