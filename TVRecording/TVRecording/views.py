@@ -95,3 +95,9 @@ def getEpisodes(show):
         episodes.extend(result['data'])
         next = result['links']['next']
     return episodes
+
+@app.route('/setRecorded', methods = ["POST"])
+def setRecorded():
+    id = request.data
+    print id
+    return 'set'

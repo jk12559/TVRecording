@@ -131,11 +131,11 @@ function generateEpisodeTable(episodes) {
     addEpisodeTableRow(episodeTable, 'DATE AIRED', 'SHOW NAME', 'SEASON', 'EPISODE #', 'EPISODE NAME', 'RECORDED'); 
     for (var i = 0; i < Object.keys(episodes).length; i++) {
         var episode = episodes[i];
-        addEpisodeTableRow(episodeTable, episode.date_aired, episode.show_name, episode.season, episode.episode_num, episode.episode_name, episode.recorded);
+        addEpisodeTableRow(episodeTable, episode.date_aired, episode.show_name, episode.season, episode.episode_num, episode.episode_name, episode.recorded, episode.id);
     }
 }
 
-function addEpisodeTableRow(table, date_aired, show_name, season, episodeNum, episode_name, recorded) {
+function addEpisodeTableRow(table, date_aired, show_name, season, episodeNum, episode_name, recorded, id) {
     row = document.createElement('TR');
     dateAiredColumn = document.createElement('TD');
     showNameColumn = document.createElement('TD');
@@ -150,7 +150,7 @@ function addEpisodeTableRow(table, date_aired, show_name, season, episodeNum, ep
     episodeNumColumn.innerHTML = episodeNum;
     episodeNameColumn.innerHTML = episode_name;
     if (recorded != 'RECORDED') {
-        recorded = '<input type="checkbox"></input>';
+        recorded = '<input type="checkbox" onclick="setRecorded()" id=' + id + '></input>';
     }
     recordedColumn.innerHTML = recorded;
 
@@ -161,4 +161,17 @@ function addEpisodeTableRow(table, date_aired, show_name, season, episodeNum, ep
     row.appendChild(episodeNameColumn);
     row.appendChild(recordedColumn);
     table.appendChild(row);
+}
+
+function setRecorded(){
+    id = document.activeElement.id;
+    var request = new XMLHttpRequest();
+    request.open('POST', '/setRecorded');
+    request.onreadystatechange = function () {
+        if (request.readyState == 4) {
+            getEpisodeList();
+        }
+    }
+    request.send(id);
+    //alert(id); //send id to episode table to set recorded flag to 1 and remove it from the table
 }
