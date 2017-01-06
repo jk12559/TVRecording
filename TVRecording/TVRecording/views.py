@@ -16,11 +16,11 @@ loginInfo = {"apikey": "7E99A86F07764359", "username": "jk12559", "userkey": "67
 @app.route('/')
 def home():
     """Renders the home page."""
-    with app.open_resource('dbPrep.sql', mode = 'r') as f:
-        db = sqlite3.connect(os.path.join(app.root_path, 'tvrecording.db'))
-        db.cursor().executescript(f.read())
-        db.commit()
-        db.close()
+   # with app.open_resource('dbPrep.sql', mode = 'r') as f:
+   #     db = sqlite3.connect(os.path.join(app.root_path, 'tvrecording.db'))
+   #     db.cursor().executescript(f.read())
+   #     db.commit()
+   #     db.close()
     return render_template(
         'index.html'
     )
@@ -52,13 +52,15 @@ def addToDB():
     episodes = getEpisodes(showID)
     for episode in episodes:
         if episode['firstAired']:
-            print episode['id']
-            c.execute('INSERT OR IGNORE INTO EPISODES (ID, SHOW_NAME, EPISODE_NAME, DATE_AIRED, SEASON, EPISODE_NUM, RECORDED) VALUES ({ID}, {SHOW_NAME}, {EPISODE_NAME}, DATE({DATE_AIRED}), {SEASON}, {EPISODE_NUM}, 0)'.format(ID = int(episode['id']),
-                                                                                                                                                                              SHOW_NAME = dQ(showName),
-                                                                                                                                                                              EPISODE_NAME = dQ(episode['episodeName'].encode('utf-8')),
-                                                                                                                                                                              DATE_AIRED = dQ(episode['firstAired']),
-                                                                                                                                                                              SEASON = int(episode['airedSeason']),
-                                                                                                                                                                              EPISODE_NUM = int(episode['airedEpisodeNumber'])))
+            airdate = datetime.strptime(episode['firstAired'], '%Y-%m-%d')
+            if airdate < datetime.now():
+                print episode['id']
+                c.execute('INSERT OR IGNORE INTO EPISODES (ID, SHOW_NAME, EPISODE_NAME, DATE_AIRED, SEASON, EPISODE_NUM, RECORDED) VALUES ({ID}, {SHOW_NAME}, {EPISODE_NAME}, DATE({DATE_AIRED}), {SEASON}, {EPISODE_NUM}, 0)'.format(ID = int(episode['id']),
+                                                                                                                                                                                  SHOW_NAME = dQ(showName),
+                                                                                                                                                                                  EPISODE_NAME = dQ(episode['episodeName'].encode('utf-8')),
+                                                                                                                                                                                  DATE_AIRED = dQ(episode['firstAired']),
+                                                                                                                                                                                  SEASON = int(episode['airedSeason']),
+                                                                                                                                                                                  EPISODE_NUM = int(episode['airedEpisodeNumber'])))
     db.commit()
     db.close()
     return 'added'
@@ -73,7 +75,7 @@ def showList():
 @app.route('/episodeList')
 def episodeList():
     db = sqlite3.connect(os.path.join(app.root_path, 'tvrecording.db'))
-    episodes = pd.read_sql('SELECT * FROM EPISODES ORDER BY DATE_AIRED ASC', db)
+    episodes = pd.read_sql('SELECT * FROM EPISODES WHERE RECORDED = 0 ORDER BY DATE_AIRED ASC', db)
     db.close()
     return episodes.T.to_json()
     #return json.dumps([x for x in episodes.T.to_dict().itervalues()])
@@ -98,6 +100,37 @@ def getEpisodes(show):
 
 @app.route('/setRecorded', methods = ["POST"])
 def setRecorded():
-    id = request.data
-    print id
+    id, older = tuple(request.data.split(','))
+    db = sqlite3.connect(os.path.join(app.root_path, 'tvrecording.db'))
+    c = db.cursor()
+    c.execute('UPDATE EPISODES SET RECORDED = 1 WHERE ID = {ID}'.format(ID = id))
+    if older == 'true':
+        c.execute('SELECT SHOW_NAME, SEASON, EPISODE_NUM FROM EPISODES WHERE ID = {ID}'.format(ID = id))
+        name, season, episode = tuple(c.fetchone())
+        c.execute('UPDATE EPISODES SET RECORDED = 1 WHERE SHOW_NAME = {NAME} AND (SEASON < {SEASON} OR (SEASON = {SEASON} AND EPISODE_NUM < {EPISODE}))'.format(NAME = sQ(name),
+                                                                                                                                                                SEASON = season,
+                                                                                                                                                                EPISODE = episode))
+    db.commit()
+    db.close()
     return 'set'
+
+@app.route('/refreshEpisodes')
+def refreshEpisodes():
+    db = sqlite3.connect(os.path.join(app.root_path, 'tvrecording.db'))
+    c = db.cursor()
+    shows = pd.read_sql('SELECT ID FROM SHOWS', db)
+    for show in shows['id']:
+        episodes = getEpisodes(show)
+        for episode in episodes:
+            if episode['firstAired']:
+                airdate = datetime.strptime(episode['firstAired'], '%Y-%m-%d')
+                if airdate < datetime.now():
+                    print episode['id']
+                    c.execute('INSERT OR IGNORE INTO EPISODES (ID, SHOW_NAME, EPISODE_NAME, DATE_AIRED, SEASON, EPISODE_NUM, RECORDED) VALUES ({ID}, {SHOW_NAME}, {EPISODE_NAME}, DATE({DATE_AIRED}), {SEASON}, {EPISODE_NUM}, 0)'.format(ID = int(episode['id']),
+                                                                                                                                                                                      SHOW_NAME = dQ(showName),
+                                                                                                                                                                                      EPISODE_NAME = dQ(episode['episodeName'].encode('utf-8')),
+                                                                                                                                                                                      DATE_AIRED = dQ(episode['firstAired']),
+                                                                                                                                                                                      SEASON = int(episode['airedSeason']),
+                                                                                                                                                                                      EPISODE_NUM = int(episode['airedEpisodeNumber'])))
+    db.commit()
+    db.close()

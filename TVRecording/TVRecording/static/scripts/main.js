@@ -1,7 +1,6 @@
 ﻿function start() {
     authenticate();
-    getShowList();
-    getEpisodeList();
+    refreshEpisodes();
 }
 
 function authenticate() {
@@ -165,6 +164,7 @@ function addEpisodeTableRow(table, date_aired, show_name, season, episodeNum, ep
 
 function setRecorded(){
     id = document.activeElement.id;
+    var x = confirm('Mark all earlier episodes as watched?')
     var request = new XMLHttpRequest();
     request.open('POST', '/setRecorded');
     request.onreadystatechange = function () {
@@ -172,6 +172,17 @@ function setRecorded(){
             getEpisodeList();
         }
     }
-    request.send(id);
-    //alert(id); //send id to episode table to set recorded flag to 1 and remove it from the table
+    request.send([id,x]);
+}
+
+function refreshEpisodes() {
+    var request = new XMLHttpRequest()
+    request.open('GET', '/refreshEpisodes');
+    request.onreadystatechange = function () {
+        if (request.readyState == 4) {
+            getShowList();
+            getEpisodeList();
+        }
+    }
+    request.send();
 }
