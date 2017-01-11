@@ -118,8 +118,9 @@ def setRecorded():
 def refreshEpisodes():
     db = sqlite3.connect(os.path.join(app.root_path, 'tvrecording.db'))
     c = db.cursor()
-    shows = pd.read_sql('SELECT ID FROM SHOWS', db)
+    shows = pd.read_sql('SELECT ID, NAME FROM SHOWS', db)
     for show in shows['id']:
+        showName = shows[shows['id'] == show]['name'].iloc[0]
         episodes = getEpisodes(show)
         for episode in episodes:
             if episode['firstAired']:
@@ -134,3 +135,4 @@ def refreshEpisodes():
                                                                                                                                                                                       EPISODE_NUM = int(episode['airedEpisodeNumber'])))
     db.commit()
     db.close()
+    return 'refreshed'
