@@ -15,7 +15,7 @@ function authenticate() {
 }
 
 function getAddShowForm() {
-    document.getElementById('searchShowForm').style.visibility = 'visible';
+    var test = window.open('/addShow', 'Add Show', 'width=400,height=300,toolbar=0,menubar=0,location=0,status=1,scrollbars=1,resizable=1,left=20,top=20');
 }
 
 function search() {

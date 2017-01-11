@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script type="text/javascript" src="static/scripts/addShow.js"></script>
+</head>
+<body>
+    <div id="searchShowForm">
+        Search for a show:<br />
+        <input type="text" id="searchText" /><br />
+        <button onclick="search()">Search</button>
+    </div>
+    <div>
+        <select id="showSelection"></select>
+        <button onclick="addToDB()">Add Show to List</button>
+    </div>
+    <div id="searchResults">
+        <table id="searchResultsTable">
+            <thead>
+                <tr>
+                    <th>ID#</th>
+                    <th>Name</th>
+                    <th>Network</th>
+                    <th>Overview</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</body>
+</html>

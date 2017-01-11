@@ -44,7 +44,9 @@
     <Content Include="requirements.txt" />
     <Content Include="TVRecording\dbPrep.sql" />
     <Content Include="TVRecording\static\content\style.css" />
+    <Content Include="TVRecording\static\scripts\addShow.js" />
     <Content Include="TVRecording\static\scripts\main.js" />
+    <Content Include="TVRecording\templates\addShow.html" />
     <Content Include="TVRecording\templates\index.html" />
     <Content Include="TVRecording\todoList.txt" />
   </ItemGroup>

@@ -25,6 +25,10 @@ def home():
         'index.html'
     )
 
+@app.route('/addShow')
+def addShow():
+    return render_template('addShow.html')
+
 @app.route('/authenticate')
 def authenticate():
     global token
