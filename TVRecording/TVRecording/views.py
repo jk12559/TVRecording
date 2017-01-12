@@ -82,7 +82,6 @@ def episodeList():
     episodes = pd.read_sql('SELECT * FROM EPISODES WHERE RECORDED = 0 ORDER BY DATE_AIRED ASC', db)
     db.close()
     return episodes.T.to_json()
-    #return json.dumps([x for x in episodes.T.to_dict().itervalues()])
 
 def sQ(text):
     return "'" + text + "'"
@@ -140,3 +139,14 @@ def refreshEpisodes():
     db.commit()
     db.close()
     return 'refreshed'
+
+@app.route('/removeShow', methods = ['POST'])
+def removeShow():
+    db = sqlite3.connect(os.path.join(app.root_path, 'tvrecording.db'))
+    c = db.cursor()
+    id = request.data
+    c.execute('DELETE FROM EPISODES WHERE SHOW_NAME IN (SELECT NAME FROM SHOWS WHERE ID = {ID})'.format(ID = id))
+    c.execute('DELETE FROM SHOWS WHERE ID = {ID}'.format(ID = id))
+    db.commit()
+    db.close()
+    return 'removed'

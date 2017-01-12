@@ -15,7 +15,7 @@ function authenticate() {
 }
 
 function getAddShowForm() {
-    var test = window.open('/addShow', 'Add Show', 'width=400,height=300,toolbar=0,menubar=0,location=0,status=1,scrollbars=1,resizable=1,left=20,top=20');
+    var test = window.open('/addShow', 'Add Show', 'width=800,height=600,toolbar=0,menubar=0,location=0,status=1,scrollbars=1,resizable=1,left=20,top=20');
 }
 
 function getShowList() {
@@ -37,22 +37,37 @@ function generateShowTable(shows) {
     while (showTable.lastChild) {
         showTable.removeChild(showTable.lastChild);
     }
-    addShowTableRow(showTable, 'ID', 'NAME');
+    addShowTableRow(showTable, 'ID', 'NAME', '');
     for (var i = 0; i < shows.length; i++) {
         var show = shows[i];
-        addShowTableRow(showTable, show.id, show.name);
+        addShowTableRow(showTable, show.id, show.name, '<button onclick=removeShow('+show.id+')>Remove</button>');
     }
 }
 
-function addShowTableRow(table, id, name) {
+function addShowTableRow(table, id, name, remove) {
     row = document.createElement('TR');
     idColumn = document.createElement('TD');
     nameColumn = document.createElement('TD');
+    removeColumn = document.createElement('TD');
     idColumn.innerHTML = id;
     nameColumn.innerHTML = name;
+    removeColumn.innerHTML = remove;
     row.appendChild(idColumn);
     row.appendChild(nameColumn);
+    row.appendChild(removeColumn);
     showTable.appendChild(row);
+}
+
+function removeShow(id) {
+    var request = new XMLHttpRequest();
+    request.open('POST', '/removeShow');
+    request.onreadystatechange = function () {
+        if (request.readyState == 4) {
+            getShowList();
+            getEpisodeList();
+        }
+    }
+    request.send(id);
 }
 
 function getEpisodeList() {
