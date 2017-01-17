@@ -152,3 +152,11 @@ def removeShow():
     db.commit()
     db.close()
     return 'removed'
+
+@app.route('/shutdown', methods = ['POST'])
+def shutdown():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not Running with the werkzeug server')
+    func()
+    return 'shutdown'

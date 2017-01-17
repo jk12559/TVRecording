@@ -156,3 +156,9 @@ function refreshEpisodes() {
     }
     request.send();
 }
+
+function shutdown() {
+    var request = new XMLHttpRequest();
+    request.open('POST', '/shutdown');
+    request.send();
+}
