@@ -138,6 +138,8 @@ function setRecorded(){
 }
 
 function refreshEpisodes() {
+    getShowList();
+    getEpisodeList();
     var request = new XMLHttpRequest()
     request.open('GET', '/refreshEpisodes');
     request.onreadystatechange = function () {
