@@ -3,7 +3,8 @@ drop table if exists episodes;
 
 create table shows (
   id integer primary key,
-  name text not null
+  name text not null,
+  url text
 );
 
 create table episodes (

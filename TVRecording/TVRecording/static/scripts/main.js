@@ -1,6 +1,5 @@
 ﻿function start() {
     authenticate();
-    refreshEpisodes();
 }
 
 function authenticate() {
@@ -9,6 +8,7 @@ function authenticate() {
     request.onreadystatechange = function() {
         if (request.readyState == 4) {
             token = request.responseText;
+            refreshEpisodes();
         }
     }
     request.send();
@@ -89,14 +89,14 @@ function generateEpisodeTable(episodes) {
     while (episodeTable.lastChild) {
         episodeTable.removeChild(episodeTable.lastChild);
     }
-    addEpisodeTableRow(episodeTable, 'DATE AIRED', 'SHOW NAME', 'SEASON', 'EPISODE #', 'EPISODE NAME', 'RECORDED'); 
+    addEpisodeTableRow(episodeTable, 'DATE AIRED', 'SHOW NAME', 'SEASON', 'EPISODE #', 'EPISODE NAME', 'RECORDED', 'LINK'); 
     for (var i = 0; i < Object.keys(episodes).length; i++) {
         var episode = episodes[i];
-        addEpisodeTableRow(episodeTable, episode.date_aired, episode.show_name, episode.season, episode.episode_num, episode.episode_name, episode.recorded, episode.id);
+        addEpisodeTableRow(episodeTable, episode.date_aired, episode.show_name, episode.season, episode.episode_num, episode.episode_name, episode.recorded, episode.url, episode.id);
     }
 }
 
-function addEpisodeTableRow(table, date_aired, show_name, season, episodeNum, episode_name, recorded, id) {
+function addEpisodeTableRow(table, date_aired, show_name, season, episodeNum, episode_name, recorded, url, id) {
     row = document.createElement('TR');
     dateAiredColumn = document.createElement('TD');
     showNameColumn = document.createElement('TD');
@@ -104,6 +104,7 @@ function addEpisodeTableRow(table, date_aired, show_name, season, episodeNum, ep
     episodeNumColumn = document.createElement('TD');
     episodeNameColumn = document.createElement('TD');
     recordedColumn = document.createElement('TD');
+    urlColumn = document.createElement('TD');
 
     dateAiredColumn.innerHTML = date_aired;
     showNameColumn.innerHTML = show_name;
@@ -114,6 +115,10 @@ function addEpisodeTableRow(table, date_aired, show_name, season, episodeNum, ep
         recorded = '<input type="checkbox" onclick="setRecorded()" id=' + id + '></input>';
     }
     recordedColumn.innerHTML = recorded;
+    if (url != 'LINK') {
+        url = '<a href = ' + url + ' target = "_blank">Webpage</a>';
+    }
+    urlColumn.innerHTML = url;
 
     row.appendChild(dateAiredColumn);
     row.appendChild(showNameColumn);
@@ -121,6 +126,7 @@ function addEpisodeTableRow(table, date_aired, show_name, season, episodeNum, ep
     row.appendChild(episodeNumColumn);
     row.appendChild(episodeNameColumn);
     row.appendChild(recordedColumn);
+    row.appendChild(urlColumn);
     table.appendChild(row);
 }
 

@@ -41,8 +41,10 @@ function displayResultsTable(data) {
 
 function addToDB() {
     var selection = document.getElementById('showSelection').value;
+    var url = document.getElementById('showUrl').value;
     var request = new XMLHttpRequest();
     request.open('POST', '/addToDB');
+    request.setRequestHeader('content-type', 'application/json');
     request.onreadystatechange = function () {
         if (request.readyState == 4) {
             window.opener.getShowList();
@@ -50,5 +52,5 @@ function addToDB() {
             window.close();
         }
     }
-    request.send(selection);
+    request.send([selection, url]);
 }

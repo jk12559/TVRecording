@@ -16,11 +16,11 @@ loginInfo = {"apikey": "7E99A86F07764359", "username": "jk12559", "userkey": "67
 @app.route('/')
 def home():
     """Renders the home page."""
-   # with app.open_resource('dbPrep.sql', mode = 'r') as f:
-   #     db = sqlite3.connect(os.path.join(app.root_path, 'tvrecording.db'))
-   #     db.cursor().executescript(f.read())
-   #     db.commit()
-   #     db.close()
+    with app.open_resource('dbPrep.sql', mode = 'r') as f:
+        db = sqlite3.connect(os.path.join(app.root_path, 'tvrecording.db'))
+        db.cursor().executescript(f.read())
+        db.commit()
+        db.close()
     return render_template(
         'index.html'
     )
@@ -47,11 +47,13 @@ def showSearch():
 def addToDB():
     db = sqlite3.connect(os.path.join(app.root_path, 'tvrecording.db'))
     c = db.cursor()
-    show = request.data
+    show, url = tuple(request.data.split(','))
     showSpace = show.find(' ')
     showID = show[:showSpace]
     showName = show[showSpace+3:]
-    c.execute('INSERT OR IGNORE INTO SHOWS (ID, NAME) VALUES ({ID}, {NAME})'.format(ID = showID, NAME = sQ(showName)))
+    c.execute('INSERT OR IGNORE INTO SHOWS (ID, NAME, URL) VALUES ({ID}, {NAME}, {URL})'.format(ID = showID, 
+                                                                                                NAME = sQ(showName),
+                                                                                                URL = sQ(url)))
 
     episodes = getEpisodes(showID)
     for episode in episodes:
@@ -79,7 +81,7 @@ def showList():
 @app.route('/episodeList')
 def episodeList():
     db = sqlite3.connect(os.path.join(app.root_path, 'tvrecording.db'))
-    episodes = pd.read_sql('SELECT * FROM EPISODES WHERE RECORDED = 0 ORDER BY DATE_AIRED ASC', db)
+    episodes = pd.read_sql('SELECT A.*, B.URL FROM EPISODES AS A LEFT JOIN SHOWS AS B ON A.SHOW_NAME = B.NAME WHERE A.RECORDED = 0 ORDER BY A.DATE_AIRED ASC', db)
     db.close()
     return episodes.T.to_json()
 
